@@ -13,7 +13,6 @@ fibC n = (a^n - b^n) / sqrt 5
 
 
 -- Generalización
-
-p xs = q 0 xs
-q _ [] = True
-q n (x:xs) = n >= 0 && q (n+x) xs
+psum xs = gpsum 0 xs
+gpsum _ [] = True
+gpsum n (x:xs) = n >= 0 && gpsum (n+x) xs
