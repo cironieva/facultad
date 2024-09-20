@@ -16,3 +16,9 @@ fibC n = (a^n - b^n) / sqrt 5
 psum xs = gpsum 0 xs
 gpsum _ [] = True
 gpsum n (x:xs) = n >= 0 && gpsum (n+x) xs
+
+
+-- Otras pruebas x
+
+sumaHastaN 0 = 0
+sumaHastaN n = n + sumaHastaN (n-1)
