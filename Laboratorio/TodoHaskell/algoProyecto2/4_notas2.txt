@@ -1,0 +1,191 @@
+-- LA PARTE DE LAS NOTAS MUSICALES
+
+data NotaBasica = Do | Re | Mi | Fa | Sol | La | Si
+                  deriving (Eq, Ord, Show)
+
+
+// NotaBasica es un DataType enumerado que tiene las notas de la escala mayor de Do
+deriving (Eq, Ord, Show) sirve para indicar que el tipo NotaBasica pertence a esas clase, permitiendo así el uso de algunas
+funciones y operadores que están definidos para los tipos de datos contenidos en esas clases de tipos.
+Eq nos permite usar == y !=. Por ejemplo Do == Do = True;  Re != Re = False
+Ord nos permite usar >,>=,<,<=,max,min. Por ejemplo Do < Re = True; max Do Re = Re
+Show nos permite imprimir en la consola los constructores de este tipo de dato, por ejemplo max Do Re devuelve Re, pero 
+ese Re para ser impreso tiene que pertenecer a la clase Show
+
+
+data Alteracion = Bemol | Natural | Sostenido
+
+// otro DataType enumerado más, como los que ya vimos
+
+
+data NotaMusical = Nota NotaBasica Alteracion
+
+// este es el primer DataType que no es enumerado, ya que sus constructores (que en este caso solo tenemos uno, Nota) tiene
+parámetros. Los parámetros son indicados no con un nombre, sino con un tipo de dato. En este caso, el constructor Nota tiene
+dos parámetros, el primero de tipo NotaBasica y el segundo de tipo Alteracion; ambos tipos definidos previamente
+
+
+sonidoNatural :: NotaBasica -> Int
+sonidoNatural Do = 0
+sonidoNatural Re = 2
+sonidoNatural Mi = 4
+sonidoNatural Fa = 5
+sonidoNatural Sol = 7
+sonidoNatural La = 9
+sonidoNatural Si = 11
+
+// sonidoNatural es una funcion que toma una NotaBasica y devuelve un entero, definimos qué entero devuelve cada NotaBasica
+de nuevo pattern matching, un return para cada constructor.
+
+
+sonidoCromatico :: NotaMusical -> Int
+sonidoCromatico (Nota x Bemol)     = sonidoNatural x - 1
+sonidoCromatico (Nota x Natural)   = sonidoNatural x
+sonidoCromatico (Nota x Sostenido) = sonidoNatural x + 1
+
+// sonidoCromatico es una funcion que toma una NotaMusical y devuelve un Int
+el tipo NotaMusical está definido de la siguiente manera (Nota NotaBasica Alteracion)
+necesitamos los paréntesis para indicar que todo eso es solo un argumento, de tipo NotaMusical
+necesitamos el constructor que vamos a usar, en este caso, Nota
+luego NotaBasica es nuestra variable independiente, se la damos al momento de llamar la funcion
+luego necesitamos un caso para cada constructor del tipo Alteracion, puesto que este parámetro es el que define el return
+en el return aprovechamos la funcion sonidoNatural que creamos antes aplicada al parámetro x. luego lo modificamos.
+
+
+instance Eq NotaMusical
+    where nota1 == nota2 = sonidoCromatico nota1 == sonidoCromatico nota2
+
+// En el tipo NotaMusical queremos dejar en claro que dos notas son iguales si tienen el mismo sonido cromatico
+esto se hace mediante la palabra clave instance
+Eq NotaMusical porque necesitamos definir el operador == para el tipo de dato NotaMusical
+la palabra clave where marca el comienzo de la sintaxis
+
+dos notas son iguales     si y solo si     una funcion aplicada a cada nota devuelve lo mismo
+   nota1 == nota2              =                          f nota1 == f nota2
+
+ese es el razonamiento que buscamos
+
+
+instance Ord NotaMusical
+    where nota1 <= nota2 = sonidoCromatico nota1 <= sonidoCromatico nota2
+
+// De igual manera, instance Ord NotaMusical sirve para establecer un orden dentro de las notas musicales
+
+nota1 es <= que nota2       si y solo si        el return de una funcion aplicada a cada nota tambien respeta esa desigualdad
+   nota1 <= nota2                =                                          f nota1 <= f nota2
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+-- LA PARTE DE LOS DEPORTISTAS
+
+-- Sinonimos de tipo
+type Altura = Int
+type NumCamiseta = Int
+type ManoHabil = PiernaHabil 
+
+-- Tipos algebraicos sin parametros (aka enumerados)
+data Zona = Arco | Defensa | Mediocampo | Delantera
+            deriving Show
+
+data TipoReves = DosManos | UnaMano
+                 deriving Show
+
+data Modalidad = Carretera | Pista | Monte | BMX
+                 deriving Show
+
+data PiernaHabil = Izquierda | Derecha
+                   deriving Show
+
+
+-- Deportista es un tipo algebraico con constructores parametricos
+data Deportista = Ajedrecista                                     -- Constructor sin argumentos
+                | Ciclista Modalidad                              -- Constructor con un argumento
+                | Velocista Altura                                -- Constructor con un argumento
+                | Tenista TipoReves ManoHabil Altura              -- Constructor con tres argumentos
+                | Futbolista Zona NumCamiseta PiernaHabil Altura  -- Constructor con cuatro argumentos
+                deriving Show
+
+
+// esas son todas las definiciones de tipo que son necesarias para las funciones que vienen a continuación
+
+
+contar_velocistas :: [Deportista] -> Int
+contar_velocistas [] = 0
+contar_velocistas ((Velocista _):xs) = 1 + contar_velocistas xs
+contar_velocistas (_:xs) = contar_velocistas xs
+
+// contar_velocistas es una funcion que toma una lista de tipo Deportista y devuelve un entero
+(Cuenta cuántos velocistas hay en esa lista dada)
+utilizaremos pattern matching y la definicion de length para programar esta funcion
+
+1. caso base: lista vacía devuelve cero
+caso recursivo: depense si el deportista es o no es velosista
+
+2. si es velocista devolvemos 1 + contar_velocistas xs
+
+3. si no lo es devolvemos contar_velocistas xs, sin sumar 1
+
+¿cómo saber si es velocista? por pattern matching. Sabemos que la lista tiene un tipo de dato Deportista.
+Entonces al descomponer la lista recursiva como (x:xs), ese x tiene que ser de tipo deportista. Lo descomponemos tambien
+((Velocista _):xs) Dejamos en claro que cuando el constructor sea Velocista, la función entra por este pattern
+el _ es necesario ya que Velocista toma además un argumento, Altura, pero como no lo usaremos dejamos simplemente _
+
+--------------------------------------------------------------
+
+contar_futbolistas :: [Deportista] -> Zona -> Int
+contar_futbolistas [] _ = 0
+contar_futbolistas ((Futbolista Arco _ _ _):xs) Arco = 1 + contar_futbolistas xs Arco
+contar_futbolistas ((Futbolista Defensa _ _ _):xs) Defensa = 1 + contar_futbolistas xs Defensa
+contar_futbolistas ((Futbolista Mediocampo _ _ _):xs) Mediocampo = 1 + contar_futbolistas xs Mediocampo
+contar_futbolistas ((Futbolista Delantera _ _ _):xs) Delantera = 1 + contar_futbolistas xs Delantera
+contar_futbolistas (_:xs) z = contar_futbolistas xs z
+
+// contar_futbolistas es una funcion que toma una lista de deportistas y una parametro tipo Zona y devuelve un entero
+(Cuenta cuántos deportistas pertenecientes a esa zona hay en la lista dada)
+
+Para ello usamos pattern matching
+
+1. Cuando la lista es vacía: caso base, no importa la zona, se aclara con _, devuelve cero
+contar_futbolistas [] _ = 0
+
+2. Cuando el deportista es futbolista: hacemos pattern matching para cada Zona posible, devolvemos 1 + funcion xs
+contar_futbolistas ((Futbolista Arco _ _ _):xs) Arco             = 1 + contar_futbolistas xs Arco
+contar_futbolistas ((Futbolista Defensa _ _ _):xs) Defensa       = 1 + contar_futbolistas xs Defensa
+contar_futbolistas ((Futbolista Mediocampo _ _ _):xs) Mediocampo = 1 + contar_futbolistas xs Mediocampo
+contar_futbolistas ((Futbolista Delantera _ _ _):xs) Delantera   = 1 + contar_futbolistas xs Delantera
+
+notar que solo necesitamos el primer parámetro de Futbolista, que es la zona, el resto no interesa, se pone _
+estos patterns tienen que estar definidos antes del paso 2
+
+3. Cuando el deportista no es futbolista: este caso va al final de todo, devuelve fijarse en el resto de la lista
+contar_futbolistas (_:xs) z = contar_futbolistas xs z
+--------------------------------------------------------------
+
+
+contar_futbolistas' :: [Deportista] -> Zona -> Int
+contar_futbolistas' xs z = length (filter (\x -> filtrar_futbolistas x z) xs)
+
+// esta funcion hace lo mismo que la de arriba, pero implementando filter
+length (filter f xs) es una linea de código que cuenta la cantidad de elementos de una lista que cumple un predicado
+
+para eso, necesitamos un predicado que devuelva True cuando un deportista es futbolista y juega en la zona deseada
+Programamos entonces, la función auxiliar que hace exactamente eso
+
+filtrar_futbolistas :: Deportista -> Zona -> Bool   -- funcion auxiliar
+filtrar_futbolistas (Futbolista Arco _ _ _) Arco             = True
+filtrar_futbolistas (Futbolista Defensa _ _ _) Defensa       = True
+filtrar_futbolistas (Futbolista Mediocampo _ _ _) Mediocampo = True
+filtrar_futbolistas (Futbolista Delantera _ _ _) Delantera   = True
+filtrar_futbolistas _ _                                      = False
+
+// está programada por pattern matching, solo devuelve false cuando el jugador no es futbolista o no juega en la zona deseada
+
+// Ahora necesitamos implementar esta funcion auxiliar como predicado de la función filter de la función principal
+
+contar_futbolistas' xs z = length (filter (\x -> filtrar_futbolistas x z) xs)
+
+filtrar futbolista necesita 2 parámetros, z que se lo damos cuando llamamos a la función y
+x, que lo sacamos de una función lambda, representa cada elemento de la lista xs, que la pasamos al llamar a la función
