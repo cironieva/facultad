@@ -1,0 +1,254 @@
+INTRODUCCIÓN A LOS ALGORITMOS PRÁCTICO 2
+Contiene aclaraciones de aquellos puntos que introducen nuevas mecánicas.
+
+
+-- EJERCICIO 3: funciones Filter
+
+Son aquellas funciones que toman una lista y devuelven esa lista pero únicamente con aquellos elementos
+que cumplen determinada condición.
+
+Este tipo de funciones se programan de la siguente manera:
+
+- tipado: [a] -> [a]
+- caso base:      funcion [] = []
+- caso recursivo: funcion (x:xs) | x cumple la condición de filtro = x : funcion xs
+                                 | x no cumple la condición de filtro = funcion xs
+
+El caso base por lo general es recibir y devolver una lista vacía
+El caso recursivo se divide en 2:
+Si el primer elemento cumple la condición de filto lo incluímos en el return
+Si no lo cumple, lo descartamos y seguimos aplicando la función al resto de la lista
+
+Otra cosa:
+
+No olvidar agregar otros parámetros a demás de la lista si fueran necesarios, en este ejemplo, n:
+
+mayoresQue :: Int -> [Int] -> [Int]
+mayoresQue n [] = []
+mayoresQue n (x:xs) | x > n = x : mayoresQue n xs
+                    | x < n = mayoresQue n xs
+
+-------------------------------------------------------------------------------------------------------
+
+
+-- EJERCICIO 4: funciones Map
+
+Son aquellas que reciben una lista y le aplican una función a cada elemento, devuelven la lista modificada.
+
+Este tipo de funciones se programan de la siguente manera:
+
+- tipado: [a] -> [a]
+- caso base:      funcion [] = []
+- caso recursivo: funcion (x:xs) g.x : funcion xs
+
+El caso base por lo general es recibir y devolver una lista vacía
+El caso recursivo se basa en aplicar la función que queremos al primer elemento de la lista, y pegarlo
+a la función aplicada al resto de la lista
+
+-------------------------------------------------------------------------------------------------------
+
+
+-- EJERCICIO 5: funciones Fold
+
+Son aquellas que reciben una lista y devuelven un valor resultante de combinar de alguna forma sus elementos
+
+Debemos identificar el cuantificador que necesitamos según lo que queremos que haga la función.
+En base a eso, podemos deducir el operador asociado a ese cuantificador
+Y en base a eso, podemos deducir el elemento neutro de ese operador, que es aquel que no modifica nada al ser aplicado.
+
+Acá una tabla de los cuantificadores más comunes, sus operadores asociados, y sus elementos neutros
+
+Cuantificador | Operador (op) |   Neutro (e)
+--------------|---------------|---------------
+   paraTodo   |       &&      |    True
+    existe    |       ||      |    False
+   sumatoria  |       +       |      0
+  productoria |       *       |      1
+
+
+Este tipo de funciones se programan de la siguente manera:
+
+- tipado: [a] -> b
+- caso base:      funcion [] = (e)
+- caso recursivo: funcion (x:xs) g.x (op) funcion xs
+
+El caso base por lo general es recibir y devolver el elemento neutro.
+El caso recursivo se basa en aplicar la función que queremos al primer elemento de la lista,
+y unirlo mediante el operador asociado a la función aplicada al resto de la lista.
+
+
+A veces no se requiere una función aplicada al primer elemento, solo el primer elemento en sí, por ejemplo:
+
+sumatoria [] = 0
+sumatoria (x:xs) = x + sumatoria xs
+
+productoria [] = 1
+productoria (x:xs) = x * productoria xs
+
+--------------------------------------------------------------------------------------------------------------
+
+
+-- EJERCICIO 6: funciones Zip
+
+Son aquellas que reciben dos o más listas y devuelven una lista de tuplas, combinando en cada elemento
+los elementos de las listas dadas.
+
+Este tipo de funciones se programan de la siguente manera:
+
+- tipado: [a] -> ... -> [n] -> [(a, ... , n)]
+- caso base:      funcion [] ys = []
+                  funcion xs [] = []
+- caso recursivo: funcion (x:xs) ... (n:ns) = (x, ..., n) : funcion xs ... ns
+
+Tipado: recibe x cantidad de listas de cualquier tipo y devuelve solo una lista de tuplas con cada parámetro
+de cada tipo de las listas de los parámetros.
+Casos base: hay como parámetros sean requeridos. Devolvemos lista vacía en cada caso de recibir lista vacía.
+Caso recursivo: toma todas las listas recursivas y combina los primeros elementos de cada lista en una tupla,
+luego lo pega a la funcion aplicada al resto de cada lista
+
+
+--------------------------------------------------------------------------------------------------------------
+
+
+-- EJERCICIO 7: funciones Unzip
+
+Son aquellas que reciben una lista de tuplas y devuelven una lista con alguno de los parámetros de las tuplas
+
+Este tipo de funciones se programan de la siguente manera:
+
+- tipado: [(a, ... , n)] -> [b]
+- caso base:      funcion [] = []
+- caso recursivo: funcion ((a, ... , n): xs) = b : funcion xs
+
+Tipado: toma una lista de tuplas y devuelve una lista de algún tipo que contenga la tupla
+Case base: por lo general recibe y devuelve una lista vacía
+Caso recursivo: el primer elemento se desglosa en forma de tupla y devuelve el parámetro que queremos pegado
+a la función aplicada al resto de la lista
+
+--------------------------------------------------------------------------------------------------------------
+
+-- EJERCICIO 8
+
+El ejercicio se trata de redefinir las funciones para listas que ya existen, para entender su funcionamiento.
+Es importante aclarar que en el tipado de las funciones usamos el tipo de dato a. que sirve para que la función
+funcione con cualquier tipo de dato que querramos
+
+funcion :: [a] -> a
+donde a puede ser Int, Bool, String o cualquier otro dato. La idea es usarlo como un comodín
+
+--------------------------------------------------------------------------------------------------------------
+
+
+-- EJERCICIO 9
+
+-- a) maximo :: [Int] -> Int, que calcula el máximo elemento de una lista de enteros
+
+maximo :: [Int] -> Int -- tipo Fold (maximo)
+maximo [x] = x
+maximo (x:xs) = max x (maximo xs)
+
+El elemento neutro para el cuantificador máximo es (- infinito)
+por supuesto es un valor que no tenemos incorporado en haskell
+así que vamos a obviar el caso base de la lista vacía, que simplemente dará error
+y tomaremos como caso base la lista de solo un elemento, que devuelve ese elemento.
+
+Lo mismo pasa en el punto e)
+
+-- e) ultimo :: [a] -> a, que devuelve el último elemento de una lista.
+
+ultimo :: [a] -> a
+ultimo [x] = x
+ultimo (x:xs) = ultimo xs
+
+obviamos el caso base de la lista vacía, que dará error
+y tomamos como caso base la lista de un único elemento.
+
+--------------------------------------------------------------------------------------------------
+
+-- UNIR LISTAS
+
+Acá vamos a diferenciar dos ejercicios: 8e y 9g.
+
+-- 8e) ++ (concatenar)
+
+concatenar :: [a] -> [a] -> [a]
+concatenar [] ys = ys
+concatenar (x:xs) ys = x : concatenar xs ys
+
+-- 9g) concat' :: [[a]] -> [a] que toma una lista de listas y devuelve la concatenación de todas ellas.
+concat' :: [[a]] -> [a]
+concat' [] = []
+concat' (x:xs) = x ++ concat xs
+
+La diferencia está en el operador que usamos para unir las listas.
+
+En el primer ejemplo usamos : porque vamos a pegar el primer elemento de una lista, a la función aplicada a dos listas
+Pero lo importante es que vamos a pegar un elemento, no una lista, por eso usamos :
+
+En el segundo ejemplo usamos ++ porque estamos pegando una lista a otra lista, si bien parece que estamos pegando un
+elemento aislado (x ++ concat xs) en realidad ese elemento, es una lista. Por el tipado de la función
+
+
+En el ejercicio 9h pasa otra cosa interesante:
+
+-- 9h) rev :: [a] -> [a] que toma una lista y devuelve una lista con los mismos elementos pero en orden inverso.
+rev :: [a] -> [a]
+rev [] = []
+rev (x:xs) = rev xs ++ [x]
+
+No podemos usar el operador : porque este nos exije pegar un elemento a la izquierda y una lista a la derecha
+Es por eso que no podemos hacer algo como xs : x, porque a la izquierda tenemos una lista y a la derecha un elemento
+Necesitamos buscar una alternativa, en este caso usamos la concatenación ++, que recibe tanto a la izquierda como a
+la derecha una lista (rev xs por definición devuelve una lista)
+
+---------------------------------------------------------------------------------------------------------------------
+
+
+-- EJERCICIO 20
+
+-- a) listasIguales :: [a] -> [a] -> Bool, que determina si dos listas son iguales, es decir, contienen los mismos elementos en las mismas posiciones respectivamente.
+
+listasIguales :: Eq a => [a] -> [a] -> Bool -- tipo Fold
+listasIguales [] [] = True
+listasIguales [] ys = False
+listasIguales xs [] = False
+listasIguales (x:xs) (y:ys) = x == y && listasIguales xs ys
+
+1. Para poder usar el operador == en tipos de datos genéricos a, necesitamos aclarar que esos tipos de datos a
+solo pueden ser aquellos en los que está definido el operador ==, esto lo hacemos agregando Eq a => al inicio del tipado
+
+2. Necesitamos 3 casos base, uno para cuando ambas listas sean vacías, y dos para cuando una lo sea y la otra no
+
+
+
+-- d) expandir :: String-> String, pone espacios entre cada letra de una palabra. Por ejemplo: expandir "hola" = "h o l a" (sin espacio al final!).
+
+expandir :: String -> String
+expandir [x] = [x]
+expandir (x:xs) = x : " " ++ expandir xs
+
+
+Este ejercicio se resuelve entendiendo que el tipo String es en realidad una lista de caracteres [Char]
+Por lo tanto debemos trabajar con ellos como tal, como listas que son.
+
+Caso base: se nos pide que no haya un espacio al final, entonces cuando la recursión llegue al último elemento, lo retornamos
+Es decir, cuando haya una lista de un solo elemento, retornar esa lista (lista = String)
+Cuando haya un String de un solo caracter, retornar ese String
+
+Caso recursivo: pegamos x al String con el espacio y lo concatenamos a la función aplicada al resto de la lista
+como : tiene mayor precedencia que ++, prescindimos de los paréntesis.
+: funciona porque estamos pegando un elemento Char a una lista [Char]
+++ funciona porque estamos pegando una lista [Char] (recién formada por :) a una lista [Char], que sabemos que es de este
+tipo porque es lo que devuelve la función según el tipado.
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+-- EJERCICIO 22
+
+Acá debemos apoyarnos constatemente de dos cosas
+1. Las listas que ya están definidas, como ventas o precios y llamarlas en la definición de las funciones
+2. El anidado de funciones, vamos a llamar a funciones dentro de otras funciones, para esto usaremos diferentes
+funciones auxiliares que deberemos programar también
+
+Sin dudas el punto más difícil de la guía, ni intentaré explicar más.

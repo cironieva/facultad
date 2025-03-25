@@ -1,0 +1,142 @@
+INTRODUCCIÓN A LOS ALGORITMOS PRÁCTICO 1
+Contiene aclaraciones de aquellos puntos que introducen nuevas mecánicas.
+
+-- EJERCICIO 14
+
+-- toma dos valores y calcula su promedio
+
+promedio :: Float -> Float -> Float
+promedio x y = (x + y) / 2
+
+
+// En este caso usamos Float como tipo de dato para las divisiones inexactas como 3 / 2
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+-- EJERCICIO 18
+
+-- a) entre0y9 : Int → Bool, que dado un entero devuelve True si el entero se encuentra entre 0 y 9.
+
+entre0y9 :: Int -> Bool
+entre0y9 x = 0 < x && x < 9
+
+// Cuando se nos pide una función que va a reducirse a devolver True o False, si es posible, no usar guardas ni casos.
+La propia expresión p < q && q < r va a reducirse por sí misma a True o False
+Programar un caso que devuelva True y un caso que devuelva False es redundante e innecesario, por ejemplo:
+
+entre0y9 x | 0 < x && x < 9 == True
+           | 0 > x || x > 9 == False
+
+Funciona, pero no es óptimo. Como dije, es redundante e innecesario.
+
+
+
+-- b) rangoPrecio : Int → String, que dado un n´umero que representa el precio de una computadora, retorne “muy barato” si el precio es menor a 2000, “demasiado caro” si el precio es mayor que 5000, “hay que verlo bien” si el precio est´a entre 2000 y 5000, y “esto no puede ser!” si el precio es negativo.
+
+rangoPrecio :: Int -> String
+rangoPrecio x | x < 0 = "esto no puede ser!"
+              | x < 2000 = "muy barato"
+              | x <= 5000 = "hay que verlo bien"
+              | x > 5000 = "demasiado caro"
+
+
+// Haskell es un lenguaje que analiza los casos vagamente, es decir, desde el primero hasta el último, en ese órden.
+Cuando un valor cumple una condición devuelve lo establecido y no se fija si cumple el resto. Por ejemplo supongamos
+que x == 10, es un valor menor a 2000, por lo que debería devolver "muy barato", pero a la vez también es menor a 5000,
+por lo que también debería devolver "demasiado caro", pero no devuelve ambas cosas. La explicación es que las funciones
+devuelven el primer valor que cumpla la condición, analizados desde arriba hacia abajo.
+
+
+
+
+-- d) esMultiplo2 : Int → Bool, que dado un entero n devuelve True si n es m´ultiplo de 2. Usar mod.
+
+esMultiplo2 :: Int -> Bool
+esMultiplo2 x = x `mod` 2 == 0
+
+
+// Cuando se nos pide algo relacionado a múltiplos o divisores, usar el operador x `mod` y
+que divide x/y y devuelve el resto de la división. Usaremos este resto devuelto para determinar divisibilidades.
+Cuando el resto es 0, algo es divisible por algo, en este caso, si x `mod` y == 0, entonces x es divisible por y,
+o x es múltiplo de y (que es lo mismo)
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+-- EJERCICIO 2O
+
+-- esBisiesto: Int→ Bool, que indica si un a˜no es bisiesto. Un a˜no es bisiesto si es divisible por 400 o es divisible por 4 pero no es divisible por 100.
+
+esBisiesto :: Int -> Bool
+esBisiesto x = x `mod` 400 == 0 || x `mod` 4 == 0 && x `mod` 100 /= 0
+
+
+// Hay dos condiciones que pueden hacer verdadera la expresión, p || q
+en este caso, q está compuesta por dos proposiciones que llamaremos q && r
+entonces podemos simplificar la función como:
+
+esBisiesto x = p || q && r
+
+pero acá surge un problema, cómo es la precedencia de || y &&? por ejemplo:
+
+(True || False) && False == False
+pero
+True || (False && False) == True
+
+entonces a qué es igual cuando no tenemos paréntesis explícitos?
+
+True || False && False
+
+este es un ejemplo de cómo tenemos programada la función, sin paréntesis.
+los paréntesis son supérfluos, porque haskell le da más precedencia a && que a ||
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+EJERCICIO 21
+
+-- dispersion : Int→ Int→ Int→ Int, que toma los tres valores y devuelve la diferencia entre el m´as alto y el m´as bajo. Ayuda: extender max y min a tres argumentos, usando las versiones de dos elementos. De esa forma se puede definir dispersi´on sin escribir ninguna guarda
+
+dispersion :: Int -> Int -> Int -> Int
+dispersion x y z = max x (max y z) - min x (min y z)
+
+// En este caso usamos paréntesis para extender la funcionalidad de las funciones máx y min
+
+   max 3 (max 4 2) 
+== max 3 (4)
+== 4
+
+se resuelve primero lo de los paréntesis y luego lo de fuera, se simplifica al valor máximo de todos.
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+-- EJERCICIO 24
+
+-- haceFrioF : Float→ Bool, indica si una temperatura expresada en grados Fahrenheit es fr´ıa. Decimos que hace fr´ıo si la temperatura es menor a 8 grados Celsius.
+
+haceFrioF :: Float -> Bool
+haceFrioF x = fahrToCelsius x < 8
+
+// No volvemos a calcular la conversión de fahrenheit a celsius, porque ya hicimos una función que lo hace, la reutilizamos.
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+TUPLAS
+
+// Consideraciones generales:
+
+1. no es obligatorio usar todas las variables declaradas, solo usar las necesarias para el funcionamiento.
+
+segundo3 (a, b, c) = b
+
+En ningún momento usa las variables a ni c.
+
+2. pueden usarse funciones dentro de una tupla
+
+ordena (a, b) = (max a b, min a b)
+mayor3 (a, b, c) = (a>3, b>3, c>3)
+
+en este caso usamos las funciones max, min y >

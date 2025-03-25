@@ -1,0 +1,118 @@
+ALGORITMOS Y ESTRUCTURAS DE DATOS PROYECTO 1
+Contiene aclaraciones de aquellos puntos que introducen nuevas mecánicas.
+
+
+-- EJERCICIO 5
+
+-- Defin ́ı nuevamente la funci ́on paratodo, pero esta vez usando la funci ́on paratodo’ (sin recursi ́on ni an ́alisis por casos!).
+
+paratodo'' :: [Bool] -> Bool
+paratodo'' xs = paratodo' xs id
+
+Acá primero lo había definido como
+
+paratodo'' xs = paratodo' (==True), ese paréntesis sería el predicado
+
+significa que cada elemento de la lista va a pasar por el predicado ==True
+pero esto genera redundancias como True==True, False==True que no es redundante pero lo mismo tiene que resolver a False
+entonces para evitar ese proceso extra simplemente usamos la función id que devuelve lo que recibe
+y entonces quedan solamente booleanos para unir con la conjunción
+
+-------------------------------------------------------------------------------------------------------------------------
+
+
+-- EJERCICIO 6
+
+-- Utilizando las funciones del ejercicio 4, program ́a las siguientes funciones por composici ́on, sin usar recursi ́on ni an ́alisis por casos.
+
+-- a) todosPares :: [Int] -> Bool verifica que todos los n ́umeros de una lista sean pares.
+
+todosPares :: [Int] -> Bool
+todosPares xs = paratodo' xs even
+
+// la funcion even devuelve true si un número es par
+
+
+-- b) hayMultiplo :: Int -> [Int] -> Bool verifica si existe alg ́un n ́umero dentro del segundo par ́ametro que sea m ́ultiplo del primer par ́ametro.
+
+hayMultiplo :: Int -> [Int] -> Bool
+hayMultiplo n xs = existe' xs (\x -> x `mod` n == 0)
+
+// existe xs necesita como segundo parámetro una función, como no la tenemos creada aparte, podemos hacer una
+función lambda, que toma un parámetro x (\x) y que calcula si mod x n es == 0
+
+
+-- c) sumaCuadrados :: Int -> Int, dado un n ́umero no negativo n, calcula la suma de los primeros n cuadrados
+
+sumaCuadrados :: Int -> Int
+sumaCuadrados n = sumatoria' [1..n] (^2)
+
+// [1..n] es la lista de los enteros desde 1 hasta n
+// [1..5] = [1,2,3,4,5]
+
+// (^2) es la función de elevar al cuadrado pero en este caso la usamos con aplicación parcial
+Esto significa que la función ^ necesita dos parámetros a, b para que pueda usarse a^b
+Pero al poner los paréntesis podemos prescindir de un parámetro, que posteriormente será reemplazado por n.
+A esto le llamamos aplicación parcial de una función.
+
+-------------------------------------------------------------------------------------------------------------------------
+
+
+EJERCICIO 6
+
+-- g) Programar la funci ́on multiplicaPrimos :: [Int] -> Int que calcula el producto de todos los n ́umeros primos de una lista.
+
+filtraPrimos :: [Int] -> [Int] -- función auxiliar
+filtraPrimos [] = []
+filtraPrimos (x:xs) | esPrimo x = x : filtraPrimos xs
+                    | otherwise = filtraPrimos xs
+
+// | otherwise sirve para todos aquellos casos que no estén definidos arriba, se usa si no se cumple ninguna guarda anterior
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+-- EJERCICIO 8
+
+--Program ́a una funci ́on que dada una lista de n ́umeros xs, devuelve la lista que resulta de duplicar cada valor de xs.
+
+-- b) Definila utilizando la función map.
+
+duplicar' :: [Int] -> [Int]
+duplicar' xs = map (*2) xs
+
+// la función map toma una función y una lista y aplica la función a cada elemento de la lista
+// map (*2) [1,2,3,4] = [2,4,6,8]
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+-- EJERCICIO 9
+
+-- Program ́a una funci ́on que dada una lista de n ́umeros xs, calcula una lista que tiene como elementos aquellos n ́umeros de xs que son primos.
+
+-- b) Definila utilizando la funci ́on filter.
+
+filtrarPrimos' :: [Int] -> [Int]
+filtrarPrimos' xs = filter esPrimo xs
+
+// la función filter toma un predicado y una lista y devuelve una lista con los elemento que cumplan ese predicado
+// filter even [1,2,3,4] = [2, 4]
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+-- EJERCICIO 10
+
+-- La funci ́on primIgualesA toma un valor y una lista, y calcula el tramo inicial m ́as largo de la lista cuyos elementos son iguales a ese valor. Por ejemplo:
+
+-- b) Program ́a nuevamente la funci ́on utilizando takeWhile.
+
+primIgualesA' :: Eq a => a -> [a] -> [a]
+primIgualesA' n xs = takeWhile (==n) xs
+
+// Eq a => nos indica que el tipo de dato a pertenece a la clase Eq
+// Es fundamental esta aclaración para poder usar ==, que está definido en la clase Eq
+
+// takeWhile toma un predicado y una lista y devuelve los primeros elementos de la lista que cumplan el predicado
+// Pero solamente si el primer elemento cumple el predicado, si no, devuelve lista vacía

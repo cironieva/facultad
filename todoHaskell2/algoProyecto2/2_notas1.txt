@@ -1,0 +1,57 @@
+data Carrera = Matematica | Fisica | Computacion | Astronomia
+
+// esto es un DataType enumerado, quiere decir que sus constructores no tienen argumentos
+se lo define con la palabra clave data y tanto su nombre como sus constructores llevan mayúscula
+los constructores estan separados entre sí por guardas
+la estructura general es así:
+
+data Nombre = Constructor1 | ... | ConstructorN
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+titulo :: Carrera -> String
+titulo Matematica = "Licenciatura en Matematica"
+titulo Fisica = "Licenciatura en Fisica"
+titulo Computacion = "Licenciatura en Ciencias de la Computacion"
+titulo Astronomia = "Licenciatura en Astronomia"
+
+
+// titulo es una funcion que toma como parámetro un dato de tipo Carrera (que acabamos de definirlo) y devuelve un String
+
+pattern matching:
+
+es indispensable definir un return de la funcion para cada constructor del tipo que recibe
+en ese caso tenemos 4 constructores en el tipo carrera, por lo tanto debemos escribir 4 definiciones para la funcion
+una definicion para cada constructor
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+minimoElemento' :: (Ord a, Bounded a) => [a] -> a
+minimoElemento' [] = maxBound
+minimoElemento' (x:xs) = min x (minimoElemento' xs)
+
+
+// minimoElemento' es una funcion que devuelve el elemento más pequeño de una lista
+Es una función polimórfica, es decir, que puede ser usada con cualquier tipo de dato a
+Pero no cualquier, cualquier tipo de dato, solo aquellos que tengan definido un orden, un máximo y un mínimo
+Esto es lo que que se aclara (Ord a, Bounded a) => 
+significa que el tipo de dato a tiene que tener un orden definido (Ord a) y un máximo y mínimo (Bounded a)
+(Ord a) nos permite usar la funcion min x y
+(Bounded a) nos permite usar la funcion maxBound
+esta última es necesaria para definir el caso base, ya que es el elemento neutro del operador min
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+primerElemento :: [a] -> Maybe a
+primerElemento [] = Nothing
+primerElemento (x:_) = Just x
+
+
+// la funcion primerElemento toma una lista polimorfica [a] y de vuelve un tipo de dato polimorfico Maybe a
+los tipos de datos Maybe agregan la posibilidad de devolver Nothing cuando una función no está definida para un pattern
+en específico, en lugar de que el intérprete lance un error
+En este caso, la función no está definida para la lista vacía, por eso devuelve Nothing
+En todos aquellos patterns que sí esté definida, devolvemos algo mediante la palabra clave Just.
